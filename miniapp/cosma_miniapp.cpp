@@ -225,6 +225,21 @@ int main(int argc, char **argv) {
         std::cout << std::endl;
     }
 
+    size_t flopCount = size_t(m) * size_t(n) * (2 * size_t(k) - 1);
+    size_t sum = 0;
+    for (auto time : times) {
+      sum += time;
+    }
+    size_t avgTime = sum / times.size();
+    double gflop = double(flopCount) / 1e9;
+    double sec = double(avgTime) / 1e3;
+    auto gflops = gflop / sec;
+    int nodes = P / 2;
+    auto gflopsPerNode = gflops / (double(nodes));
+    if (rank == 0) {
+      printf("On %ld nodes achieved GFLOPS per node: %lf.\n", nodes, gflopsPerNode);
+    }
+
     if (test_correctness && rank == 0) {
         std::string yes_no = result_correct ? "" : " NOT";
         std::cout << "Result is" << yes_no << " CORRECT!" << std::endl;
