@@ -61,6 +61,7 @@ int main(int argc, char **argv) {
             "defines which algorithm (cosma, scalapack or both) to run",
             cxxopts::value<std::string>()->default_value("both"))
         ("h,help", "Print usage.")
+        ("procs_per_node", "MPI Processes per node", cxxopts::value<int>()->default_value("1"))
     ;
 
     auto result = options.parse(argc, argv);
@@ -72,6 +73,7 @@ int main(int argc, char **argv) {
     auto m = result["m_dim"].as<int>();
     auto n = result["n_dim"].as<int>();
     auto k = result["k_dim"].as<int>();
+    auto procsPerNode = result["procs_per_node"].as<int>();
 
     auto block_a = result["block_a"].as<std::vector<int>>();
     auto block_b = result["block_b"].as<std::vector<int>>();
@@ -370,8 +372,7 @@ int main(int argc, char **argv) {
     double gflop = double(flopCount) / 1e9;
     double sec = double(avgTime) / 1e3;
     auto gflops = gflop / sec;
-    // int nodes = P / 2;
-    int nodes = P;
+    int nodes = P / procsPerNode;
     auto gflopsPerNode = gflops / (double(nodes));
     if (rank == 0) {
       printf("On %ld nodes achieved GFLOPS per node: %lf.\n", nodes, gflopsPerNode);
