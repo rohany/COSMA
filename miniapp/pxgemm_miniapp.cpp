@@ -360,6 +360,23 @@ int main(int argc, char **argv) {
         }
     }
 
+    assert(algorithm == "scalapack");
+    size_t flopCount = size_t(m) * size_t(n) * (2 * size_t(k) - 1);
+    size_t sum = 0;
+    for (auto time : scalapack_times) {
+      sum += time;
+    }
+    size_t avgTime = sum / scalapack_times.size();
+    double gflop = double(flopCount) / 1e9;
+    double sec = double(avgTime) / 1e3;
+    auto gflops = gflop / sec;
+    // int nodes = P / 2;
+    int nodes = P;
+    auto gflopsPerNode = gflops / (double(nodes));
+    if (rank == 0) {
+      printf("On %ld nodes achieved GFLOPS per node: %lf.\n", nodes, gflopsPerNode);
+    }
+
     if (test_correctness) {
         int result = result_correct ? 0 : 1;
         int global_result = 0;
