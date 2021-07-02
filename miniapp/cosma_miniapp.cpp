@@ -130,6 +130,7 @@ int main(int argc, char **argv) {
         ("test",
             "test the result correctness.",
             cxxopts::value<bool>()->default_value("false"))
+        ("procs_per_node", "MPI Processes per node", cxxopts::value<int>()->default_value("1"))
         ("h,help", "Print usage.")
         ;
 
@@ -142,6 +143,7 @@ int main(int argc, char **argv) {
     auto m = result["m_dim"].as<int>();
     auto n = result["n_dim"].as<int>();
     auto k = result["k_dim"].as<int>();
+    auto procsPerNode = result["procs_per_node"].as<int>();
     auto steps = result["steps"].as<std::vector<std::string>>();
     auto n_rep = result["n_rep"].as<int>();
     auto type = result["type"].as<std::string>();
@@ -234,7 +236,7 @@ int main(int argc, char **argv) {
     double gflop = double(flopCount) / 1e9;
     double sec = double(avgTime) / 1e3;
     auto gflops = gflop / sec;
-    int nodes = P / 2;
+    int nodes = P / procsPerNode;
     auto gflopsPerNode = gflops / (double(nodes));
     if (rank == 0) {
       printf("On %ld nodes achieved GFLOPS per node: %lf.\n", nodes, gflopsPerNode);
